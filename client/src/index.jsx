@@ -15,6 +15,7 @@ class App extends React.Component {
   componentDidMount() {
     console.log('got here');
     $.get("/repos", function(reposArray) {
+      console.log(reposArray)
     })
     .done(reposArray => {
       this.setState({
@@ -31,13 +32,17 @@ class App extends React.Component {
       url: "/repos",
       data: {data: term}
     })
-  .done(function(res) {
-    console.log( "Data Saved: " + res );
+  .done(res => {
+    this.setState({
+      repos: res
+    })
+    console.log('LSKDJFLSDJFL',res)
   });
 
   }
 
   render () {
+    console.log('repos', this.state.repos);
     return (<div>
       <h1>Github Fetcher</h1>
       <RepoList repos={this.state.repos}/>

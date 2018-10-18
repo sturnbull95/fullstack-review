@@ -8,15 +8,26 @@ let app = express();
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(__dirname + '/../client/dist'));
 
-
+function helper(flag){
+  while(flag === false){
+  }
+  Save.repoFinder(function(repos) {
+    res.send(repos);
+  })
+}
 app.post('/repos', function (req, res) {
-  console.log(req.body)
   helpers.getReposByUsername(req.body.data, function(githubObject) {
-    Save.save(githubObject);
+    Save.save(githubObject,function(){
+      Save.repoFinder(function(repos) {
+        res.send(repos);
+      })
+    })
+    setTimeout(function(){
+      Save.repoFinder(function(repos) {
+        res.send(repos);
+      })},700)
   });
-  res.end('got here');
 });
-
 app.get('/repos', function (req, res) {
   Save.repoFinder(function(repos) {
     res.send(repos);

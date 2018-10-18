@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'); 
+const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/fetcher');
 
 
@@ -14,30 +14,44 @@ let repoSchema = mongoose.Schema({
 
 let Repo = mongoose.model('Repo', repoSchema);
 
-let save = (githubObject) => {
+let help = (obj, parsedRepos, callback) => {
+  var repoObj = {};
+  var repoArray = [];
+  Repo.find({id:obj.id}, function(err,repos){
+    if(repos.length === 0){
+      repoObj.id = obj.id;
+      repoObj.name = obj.name;
+      repoObj.owner = obj.owner.login;
+      repoObj.description = obj.description;
+      repoObj.avatar_url = obj.avatar_url;
+      repoObj.html_url = obj.html_url;
+
+      var repo = new Repo(repoObj);
+
+      repo.save(function (err) {
+        if (err) {
+          console.log(err);
+        }
+      })
+      repoArray.push(repoObj);
+    } else{
+      console.log('not important');
+    }
+
+  })
+}
+
+let save = (githubObject, callback) => {
 
   var repoArray = [];
   var parsedRepos = JSON.parse(githubObject.body);
-
+  //let flag = false;
   for (var i = 0; i < parsedRepos.length; i++) {
-    var repoObj = {};
-
-    repoObj.id = parsedRepos[i].id;
-    repoObj.name = parsedRepos[i].name;
-    repoObj.owner = parsedRepos[i].owner.login;
-    repoObj.description = parsedRepos[i].description;
-    repoObj.avatar_url = parsedRepos[i].avatar_url;
-    repoObj.html_url = parsedRepos[i].html_url;
-
-    var repo = new Repo(repoObj); //new document
-
-    repo.save(function (err) {
-      if (err) {
-        console.log(err);
-      }
-    })
-    repoArray.push(repoObj);
-  }
+    var newPar = parsedRepos[i]
+    console.log(newPar)
+    help(newPar);
+    
+    }
 }
 
 var repoFinder = function(callback) {
